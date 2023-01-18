@@ -32,20 +32,36 @@ const run = (inputFile, outputFile) => {
   fs.createReadStream(inputFile)
     .pipe(csv.parse())
     .on("data", (data) => {
-      console.log("data: ", data);
-      if (data[2] === "종목명") {
-        return;
-      }
+      if (data.length == 10) {
+        if (data[1] === "종목명") {
+          return;
+        }
 
-      let number = data[7];
-      number = number.replaceAll(",", "");
-      const result = {
-        header: `${data[4]} ${data[2]} (${data[6]}%) (${Math.round(
-          parseInt(number) / 1000
-        )}K)`,
-        거래량: `${data[7]}`,
-      };
-      dataArr.push(result);
+        let number = data[6];
+        number = number.replaceAll(",", "");
+        const result = {
+          header: `${data[3]} ${data[1]} (${data[5]}%) (${Math.round(
+            parseInt(number) / 1000
+          )}K)`,
+          거래량: `${data[6]}`,
+        };
+        dataArr.push(result);
+      } else {
+        // 장중상승
+        if (data[2] === "종목명") {
+          return;
+        }
+
+        let number = data[7];
+        number = number.replaceAll(",", "");
+        const result = {
+          header: `${data[4]} ${data[2]} (${data[6]}%) (${Math.round(
+            parseInt(number) / 1000
+          )}K)`,
+          거래량: `${data[7]}`,
+        };
+        dataArr.push(result);
+      }
     })
     .on("end", () => {
       console.log(dataArr);
