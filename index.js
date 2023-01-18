@@ -1,28 +1,47 @@
 const csv = require("csv-parse");
+const iconv = require("iconv-lite");
+const jschardet = require("jschardet");
+const xlsx = require("xlsx");
 const fs = require("fs");
 const path = require("path");
 
-const inputFile = path.resolve("input/2_input_utf8.csv");
+const inputFile = path.resolve("input/2_input.csv");
+const outputFile = path.resolve("output/output.xlsx");
 
-// const data = fs.readFileSync(inputFile, { encoding: "utf8" });
-// // console.log(data.toString());
-// const records = csv.parse(data.toString());
-// console.log(records);
+const content = fs.readFileSync(inputFile, "binary");
+const charset = jschardet.detect(content);
+if (charset.encoding === "EUC-KR") {
+  const utf8Text = iconv.decode(content, "euc-kr");
+  fs.writeFileSync(inputFile, utf8Text, "utf-8");
+}
 
 const dataArr = [];
 fs.createReadStream(inputFile)
   .pipe(csv.parse())
   .on("data", (data) => {
+    console.log("data: ", data);
+    if (data[2] === "종목명") {
+      return;
+    }
+
     let number = data[7];
     number = number.replaceAll(",", "");
     const result = {
       header: `${data[4]} ${data[2]} (${data[6]}%) (${Math.round(
         parseInt(number) / 1000
-      )}K)}`,
+      )}K)`,
       거래량: `${data[7]}`,
     };
     dataArr.push(result);
   })
   .on("end", () => {
     console.log(dataArr);
+    exportExcel(dataArr);
   });
+
+const exportExcel = (dataset) => {
+  const book = xlsx.utils.book_new();
+  const data = xlsx.utils.json_to_sheet(dataset);
+  xlsx.utils.book_append_sheet(book, data);
+  xlsx.writeFile(book, outputFile);
+};
