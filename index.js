@@ -40,7 +40,7 @@ const run = (inputFile, outputFile) => {
         let number = data[6];
         number = number.replaceAll(",", "");
         const result = {
-          header: `${data[3]} ${data[1]} (${data[5]}%) (${Math.round(
+          header: `${data[3]} ${data[1]} (${data[5]}) (${Math.round(
             parseInt(number) / 1000
           )}K)`,
           거래량: `${data[6]}`,
