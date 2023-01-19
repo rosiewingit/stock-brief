@@ -72,6 +72,35 @@ const run = (inputFile, outputFile) => {
 const exportExcel = (dataset, outputFile) => {
   const book = xlsx.utils.book_new();
   const data = xlsx.utils.json_to_sheet(dataset);
-  xlsx.utils.book_append_sheet(book, data);
+  data["!cols"] = [{ wpx: 200 }, { wpx: 70 }];
+
+  // for (let i in data) {
+  //   data[`B${i}`].s = {
+  //     fill: {
+  //       patternType: "solid",
+  //       bgColor: { rgb: "FFFFAA00" },
+  //     },
+  //   };
+  // }
+
+  // for (let i = 2; i < data.length; i++) {
+  //   // data[`B${i}`].s = {
+  //   // fill: {
+  //   //   patternType: "solid",
+  //   //   bgColor: { rgb: "FFFFAA00" },
+  //   // },
+  //   // };
+  //   let tmpValue = data[`B${i}`].v;
+  //   console.log("tmpValue: ", tmpValue);
+  //   let modified = tmpValue.replaceAll(",", "");
+  //   console.log("modified: ", modified);
+  //   let intValue = parseInt(modified);
+  //   if (intValue >= 10000000) {
+  //     data[`B${i}`].v = `▲ ${tmpValue}`;
+  //     console.log("data[`B${i}`].v: ", data[`B${i}`].v);
+  //   }
+  // }
+
+  xlsx.utils.book_append_sheet(book, data, "stock");
   xlsx.writeFile(book, outputFile);
 };
