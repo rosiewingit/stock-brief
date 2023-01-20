@@ -1,6 +1,6 @@
 {
   "name": "stock-brief",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "csv to excel",
   "main": "index.js",
   "bin": "index.js",
@@ -21,9 +21,9 @@
   "homepage": "https://github.com/rosiewingit/stock-brief#readme",
   "dependencies": {
     "csv-parse": "^5.3.3",
+    "excel4node": "^1.8.0",
     "iconv-lite": "^0.6.3",
     "jschardet": "^3.0.0",
-    "path": "^0.12.7",
-    "xlsx": "^0.18.5"
+    "path": "^0.12.7"
   }
 }

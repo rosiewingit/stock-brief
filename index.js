@@ -1,9 +1,9 @@
 const csv = require("csv-parse");
 const iconv = require("iconv-lite");
 const jschardet = require("jschardet");
-const xlsx = require("xlsx");
 const fs = require("fs");
 const path = require("path");
+const excel = require("excel4node");
 
 const inputDir = "input";
 const outputDir = "output";
@@ -64,43 +64,56 @@ const run = (inputFile, outputFile) => {
       }
     })
     .on("end", () => {
+      console.log("Start to create an excel.");
+      console.log(outputFile);
       console.log(dataArr);
+      console.log("Completed to create an excel.\n\n");
       exportExcel(dataArr, outputFile);
     });
 };
 
 const exportExcel = (dataset, outputFile) => {
-  const book = xlsx.utils.book_new();
-  const data = xlsx.utils.json_to_sheet(dataset);
-  data["!cols"] = [{ wpx: 200 }, { wpx: 70 }];
+  const book = new excel.Workbook({});
+  const sheet = book.addWorksheet("stock");
 
-  // for (let i in data) {
-  //   data[`B${i}`].s = {
-  //     fill: {
-  //       patternType: "solid",
-  //       bgColor: { rgb: "FFFFAA00" },
-  //     },
-  //   };
-  // }
+  const headerStyle = book.createStyle({
+    font: {
+      bold: true,
+    },
+  });
 
-  // for (let i = 2; i < data.length; i++) {
-  //   // data[`B${i}`].s = {
-  //   // fill: {
-  //   //   patternType: "solid",
-  //   //   bgColor: { rgb: "FFFFAA00" },
-  //   // },
-  //   // };
-  //   let tmpValue = data[`B${i}`].v;
-  //   console.log("tmpValue: ", tmpValue);
-  //   let modified = tmpValue.replaceAll(",", "");
-  //   console.log("modified: ", modified);
-  //   let intValue = parseInt(modified);
-  //   if (intValue >= 10000000) {
-  //     data[`B${i}`].v = `▲ ${tmpValue}`;
-  //     console.log("data[`B${i}`].v: ", data[`B${i}`].v);
-  //   }
-  // }
+  const highlightStyle = book.createStyle({
+    font: {
+      color: "red",
+    },
+  });
 
-  xlsx.utils.book_append_sheet(book, data, "stock");
-  xlsx.writeFile(book, outputFile);
+  sheet.cell(1, 1).string("header").style(headerStyle);
+  sheet.cell(1, 2).string("거래량").style(headerStyle);
+  let i = 0;
+  for (i = 0; i < dataset.length; i++) {
+    let header = dataset[i].header;
+    let number = dataset[i]["거래량"];
+
+    sheet.cell(i + 2, 1).string(header);
+    if (checkCell(number)) {
+      sheet
+        .cell(i + 2, 2)
+        .string(number)
+        .style(highlightStyle);
+    } else {
+      sheet.cell(i + 2, 2).string(number);
+    }
+  }
+
+  book.write(outputFile);
+};
+
+const checkCell = (value) => {
+  let modified = value.replaceAll(",", "");
+  let intValue = parseInt(modified);
+  if (intValue >= 10000000) {
+    return true;
+  }
+  return false;
 };
