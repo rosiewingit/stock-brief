@@ -82,6 +82,12 @@ const exportExcel = (dataset, outputFile) => {
     },
   });
 
+  const underlineStyle = book.createStyle({
+    font: {
+      underline: true,
+    },
+  });
+
   const highlightStyle = book.createStyle({
     font: {
       color: "red",
@@ -95,13 +101,17 @@ const exportExcel = (dataset, outputFile) => {
     let header = dataset[i].header;
     let number = dataset[i]["거래량"];
 
-    sheet.cell(i + 2, 1).string(header);
     if (checkCell(number)) {
+      sheet
+        .cell(i + 2, 1)
+        .string(header)
+        .style(underlineStyle);
       sheet
         .cell(i + 2, 2)
         .string(number)
         .style(highlightStyle);
     } else {
+      sheet.cell(i + 2, 1).string(header);
       sheet.cell(i + 2, 2).string(number);
     }
   }
