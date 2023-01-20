@@ -1,12 +1,13 @@
 {
   "name": "stock-brief",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "csv to excel",
   "main": "index.js",
   "bin": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pkg": "pkg . --target node18-win-x64 --output stock-v1.0.1.exe"
   },
   "repository": {
     "type": "git",
