@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "pkg": "pkg . --target node18-win-x64 --output stock-v1.0.1.exe"
+    "pkg": "pkg . --target node18-win-x64 --output stock-v1.0.2.exe"
   },
   "repository": {
     "type": "git",
