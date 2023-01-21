@@ -1,13 +1,13 @@
 {
   "name": "stock-brief",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "csv to excel",
   "main": "index.js",
   "bin": "index.js",
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "pkg": "pkg . --target node18-win-x64 --output stock-v1.1.0.exe"
+    "pkg": "pkg . --target node18-win-x64 --output muzinstock.exe"
   },
   "pkg": {
     "assets": "./node_modules/figlet/fonts/Standard.flf"
