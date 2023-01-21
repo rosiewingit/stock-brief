@@ -9,6 +9,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "pkg": "pkg . --target node18-win-x64 --output stock-v1.1.0.exe"
   },
+  "pkg": {
+    "assets": "./node_modules/figlet/fonts/Standard.flf"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rosiewingit/stock-brief.git"
