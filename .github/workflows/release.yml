@@ -1,13 +1,39 @@
 name: Release
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 jobs:
+  prerelease:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.prerelease.outputs.upload_url }}
+    steps:
+      - name: Get version from tag
+        id: tagname
+        run: |
+          echo ::set-output name=current_version::${GITHUB_REF#refs/tags/v}
+        shell: bash
+
+      - name: Create release
+        id: prerelease
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{env.BUILD_CONFIGURATION}} ${{ github.ref }}
+          body: |
+            Automated Release by GitHub Action CI
+          draft: false
+          prerelease: false
+
   build:
+    needs: prerelease
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout codes
+        uses: actions/checkout@v2
       - name: Install modules
         run: npm install
       - name: Install pkg
@@ -17,5 +43,20 @@ jobs:
       - name: Create dir
         run: mkdir input
       - name: Make zip file
-        run: zip ./muzinstock.zip muzinstock.exe input
+        run: zip ./muzinstock-${{ steps.tagname.outputs.current_version }}.zip muzinstock.exe input
         shell: bash
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.prerelease.outputs.upload_url }}
+          asset_path: ./${{env.PRJNAME}}.${{ steps.tagname.outputs.current_version }}.zip
+          asset_name: ${{env.PRJNAME}}.${{ steps.tagname.outputs.current_version }}.zip
+          asset_content_type: application/zip
