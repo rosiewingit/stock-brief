@@ -7,9 +7,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       # 모듈 설치
       - name: Install modules
-        run: npm install --force
+        run: npm install
       # pkg 명령
       - name: Create package
         run: npm run pkg
