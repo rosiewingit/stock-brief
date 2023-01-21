@@ -17,5 +17,5 @@ jobs:
       - name: Create dir
         run: mkdir input
       - name: Make zip file
-        run: zip -r ./muzinstock.zip .
+        run: zip ./muzinstock.zip muzinstock.exe input
         shell: bash
