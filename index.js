@@ -159,7 +159,7 @@ const checkCell = (value) => {
 const getCompanyDart = (corpCode) => {
   let code = `${corpCode.replace("'", "").trim()}`;
 
-  let searchUrl = `${hostUrl}/list.json?crtfc_key=${ACCESS_TOKEN}&corp_code=${code}&bgn_de=20210101&last_reprt_at=Y&pblntf_ty=A&pblntf_detail_ty=A001`;
+  let searchUrl = `${hostUrl}/list.json?crtfc_key=${ACCESS_TOKEN}&corp_code=${code}&bgn_de=20220101&last_reprt_at=Y&pblntf_ty=A&pblntf_detail_ty=A001`;
   const body = fetch(searchUrl).json();
 
   if (!body) {
