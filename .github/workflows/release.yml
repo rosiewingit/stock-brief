@@ -14,15 +14,5 @@ jobs:
         run: npm install -g pkg
       - name: Create package
         run: npm run pkg
-  release:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Create Release
-        runs-on: ubuntu-latest
-        outputs:
-          version: ${{ steps.step_version.outputs.version }}
-          upload_url: ${{ steps.step_upload_url.outputs.upload_url }}
-      - name: Version, Upload_url
-        run: echo "::set-output name=version::${{ steps.package_version.outputs.version }}"
-        run: echo "::set-output name=upload_url::${{ steps.create_release.outputs.upload_url }}"
+      - name: Create dir
+        run: mkdir output
