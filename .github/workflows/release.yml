@@ -9,7 +9,7 @@ jobs:
     steps:
       # 모듈 설치
       - name: Install modules
-        run: npm install
+        run: npm install --force
       # pkg 명령
       - name: Create package
         run: npm run pkg
