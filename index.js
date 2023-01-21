@@ -88,10 +88,11 @@ const run = (inputFile, outputFile) => {
     })
     .on("end", () => {
       console.log("Start to create an excel.");
+      !fs.existsSync(outputDir) && fs.mkdirSync(outputDir);
       console.log(outputFile);
       console.log(dataArr);
-      console.log("Completed to create an excel.\n\n");
       exportExcel(dataArr, outputFile);
+      console.log("Completed to create an excel.\n\n");
     });
 };
 
