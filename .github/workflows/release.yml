@@ -15,4 +15,7 @@ jobs:
       - name: Create package
         run: npm run pkg
       - name: Create dir
-        run: mkdir output
+        run: mkdir input
+      - name: Make zip file
+        run: zip -r ./muzinstock.zip .
+        shell: bash
