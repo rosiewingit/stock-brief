@@ -1,13 +1,13 @@
 {
   "name": "stock-brief",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "csv to excel",
   "main": "index.js",
   "bin": "index.js",
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "pkg": "pkg . --target node18-win-x64 --output stock-v1.0.3.exe"
+    "pkg": "pkg . --target node18-win-x64 --output stock-v1.0.4.exe"
   },
   "repository": {
     "type": "git",
@@ -22,8 +22,10 @@
   "dependencies": {
     "csv-parse": "^5.3.3",
     "excel4node": "^1.8.0",
+    "figlet": "^1.5.2",
     "iconv-lite": "^0.6.3",
     "jschardet": "^3.0.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "sync-fetch": "^0.4.2"
   }
 }
