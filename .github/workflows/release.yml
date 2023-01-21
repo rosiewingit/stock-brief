@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      # 모듈 설치
       - name: Install modules
         run: npm install
-      # pkg 명령
+      - name: Install pkg
+        run: npm install -g pkg
       - name: Create package
         run: npm run pkg
   release:
