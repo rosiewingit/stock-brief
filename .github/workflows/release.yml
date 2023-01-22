@@ -24,7 +24,7 @@ jobs:
           mkdir input
           zip -r muzinstock.zip muzinstock.exe input
 
-  prerelease:
+  release:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -41,10 +41,6 @@ jobs:
           draft: false
           prerelease: false
 
-  release:
-    needs: prerelease
-    runs-on: ubuntu-latest
-    steps:
       - name: Upload assets
         uses: actions/upload-release-asset@v1
         env:
