@@ -7,6 +7,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Get version from tag
+        id: tagname
+        run: |
+          echo "name=current_version::${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        shell: bash
+
       - name: Checkout codes
         uses: actions/checkout@v2
 
@@ -22,7 +28,7 @@ jobs:
       - name: Make a zip
         run: |
           mkdir input
-          zip -r muzinstock-${{ github.ref }}.zip muzinstock.exe input
+          zip -r muzinstock-${{ steps.tagname.outputs.current_version }}.zip muzinstock.exe input
 
       - name: Create release
         id: create_release
@@ -30,8 +36,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.AUTOCI }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          tag_name: ${{ steps.tagname.outputs.current_version }}
+          release_name: ${{ steps.tagname.outputs.current_version }}
           body: |
             Automated Release by GitHub Action CI
           draft: false
@@ -43,6 +49,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.AUTOCI }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./muzinstock-${{ github.ref }}.zip
-          asset_name: muzinstock-${{ github.ref }}.zip
+          asset_path: ./muzinstock-${{ steps.tagname.outputs.current_version }}.zip
+          asset_name: muzinstock-${{ steps.tagname.outputs.current_version }}.zip
           asset_content_type: application/zip
