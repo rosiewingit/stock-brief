@@ -24,10 +24,6 @@ jobs:
           mkdir input
           zip -r muzinstock.zip muzinstock.exe input
 
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
