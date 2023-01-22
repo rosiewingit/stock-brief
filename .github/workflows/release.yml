@@ -46,7 +46,7 @@ jobs:
         run: mkdir input
       - name: Copy files
         run: |
-          cp input muzinstock
+          cp -r input muzinstock
           cp muzinstock.exe muzinstock
 
   release:
