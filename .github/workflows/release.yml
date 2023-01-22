@@ -22,7 +22,7 @@ jobs:
       - name: Make a zip
         run: |
           mkdir input
-          zip -r muzinstock-${{ github.ref }}.zip muzinstock.exe input
+          zip -r muzinstock.zip muzinstock.exe input
 
       - name: Create release
         id: create_release
