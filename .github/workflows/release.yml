@@ -59,4 +59,4 @@ jobs:
         with:
           pattern: "packages/*"
           github-token: ${{ secrets.AUTOCI }}
-          release-url: ${{ github.event.client_payload.url }}
+          release-url: ${{ steps.prerelease.outputs.upload_url }}
