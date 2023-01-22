@@ -52,7 +52,8 @@ jobs:
     steps:
       - name: Upload assets
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: "muzinstock.zip"
         env:
           GITHUB_TOKEN: ${{ secrets.AUTOCI }}
-        with:
-          files: muzinstock.zip
