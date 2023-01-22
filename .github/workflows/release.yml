@@ -4,57 +4,53 @@ on:
     tags:
       - "v*.*.*"
 jobs:
-  prerelease:
+  build:
     runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.prerelease.outputs.upload_url }}
     steps:
-      - name: Get version from tag
-        id: tagname
-        run: |
-          echo "name=current_version::${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-        shell: bash
+      - name: Checkout codes
+        uses: actions/checkout@v2
 
+      - name: Install modules
+        run: npm install
+
+      - name: Install pkg
+        run: npm install -g pkg
+
+      - name: Create package
+        run: npm run pkg
+
+      - name: Make a zip
+        run: |
+          mkdir input
+          zip -r muzinstock.zip muzinstock.exe input
+
+  prerelease:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       - name: Create release
-        id: prerelease
-        uses: actions/create-release@latest
+        id: create-release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.AUTOCI }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: ${{ steps.tagname.outputs.current_version }}
+          release_name: ${{ github.ref }}
           body: |
             Automated Release by GitHub Action CI
           draft: false
           prerelease: false
 
-  build:
+  release:
     needs: prerelease
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout codes
-        uses: actions/checkout@v3
-      - name: Install modules
-        run: npm install
-      - name: Install pkg
-        run: npm install -g pkg
-      - name: Create package
-        run: npm run pkg
-      - name: Create muzinstock dir
-        run: mkdir muzinstock
-      - name: Create input dir
-        run: mkdir input
-      - name: Copy files
-        run: |
-          cp -r input muzinstock
-          cp muzinstock.exe muzinstock
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
       - name: Upload assets
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTOCI }}
         with:
-          name: muzinstock
-          path: muzinstock
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./muzinstock.zip
+          asset_name: muzinstock.zip
+          asset_content_type: application/zip
