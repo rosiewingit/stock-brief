@@ -56,4 +56,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.AUTOCI }}
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: muzinstock-${{ ssteps.prerelease.tagname.outputs.current_version }}.zip
+          files: muzinstock-${{ steps.prerelease.tagname.outputs.current_version }}.zip
