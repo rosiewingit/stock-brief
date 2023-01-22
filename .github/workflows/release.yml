@@ -40,18 +40,21 @@ jobs:
         run: npm install -g pkg
       - name: Create package
         run: npm run pkg
-      - name: Create dir
+      - name: Create muzinstock dir
+        run: mkdir muzinstock
+      - name: Create input dir
         run: mkdir input
-      - name: Make zip file
-        run: zip ./muzinstock.zip muzinstock.exe input
-        shell: bash
+      - name: Copy files
+        run: |
+          cp input muzinstock
+          cp muzinstock.exe muzinstock
 
   release:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Upload assets
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: "muzinstock"
-          path: ./*
+          name: muzinstock
+          path: muzinstock
