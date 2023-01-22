@@ -12,7 +12,8 @@ jobs:
       - name: Get version from tag
         id: tagname
         run: |
-          echo ::set-output name=current_version::${GITHUB_REF#refs/tags/v}
+          echo "name=current_version::${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
         shell: bash
 
       - name: Create release
