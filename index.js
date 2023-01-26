@@ -99,7 +99,11 @@ const run = (inputFile, outputFile) => {
 const exportExcel = (dataset, outputFile) => {
   console.log(dataset);
   const book = new excel.Workbook({});
-  const sheet = book.addWorksheet("stock");
+  const sheet = book.addWorksheet("stock", {
+    pageSetup: {
+      fitToWidth: 3,
+    },
+  });
 
   const headerStyle = book.createStyle({
     font: {
@@ -109,6 +113,7 @@ const exportExcel = (dataset, outputFile) => {
 
   const underlineStyle = book.createStyle({
     font: {
+      bold: true,
       underline: true,
     },
   });
@@ -119,6 +124,8 @@ const exportExcel = (dataset, outputFile) => {
     },
   });
 
+  sheet.column(1).setWidth(40);
+  sheet.column(3).setWidth(56);
   sheet.cell(1, 1).string("header").style(headerStyle);
   sheet.cell(1, 2).string("거래량").style(headerStyle);
   sheet.cell(1, 3).string("사업보고서").style(headerStyle);
@@ -137,14 +144,16 @@ const exportExcel = (dataset, outputFile) => {
         .cell(i + 2, 2)
         .string(number)
         .style(highlightStyle);
-      sheet.cell(i + 2, 3).string(doc);
+      sheet.cell(i + 2, 4).string(doc);
+      sheet.cell(i + 2, 3).formula(`HYPERLINK(D${i + 2},D${i + 2})`);
     } else {
       sheet.cell(i + 2, 1).string(header);
       sheet.cell(i + 2, 2).string(number);
-      sheet.cell(i + 2, 3).string(doc);
+      sheet.cell(i + 2, 4).string(doc);
+      sheet.cell(i + 2, 3).formula(`HYPERLINK(D${i + 2},D${i + 2})`);
     }
   }
-
+  sheet.column(4).hide();
   book.write(outputFile);
 };
 
