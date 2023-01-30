@@ -6,38 +6,27 @@ const path = require("path");
 const excel = require("excel4node");
 const fetch = require("sync-fetch");
 const figlet = require("figlet");
+const readExcel = require("read-excel-file/node");
+const { resolve } = require("path");
+
+let stockCustomData = {};
 
 // open dart
 const ACCESS_TOKEN = "7fbfd9d3f1ac4b90767562d3de65bf56f621a36b";
 const hostUrl = "https://opendart.fss.or.kr/api";
 
-// input / output
+// input / output / information
 const inputDir = "input";
 const outputDir = "output";
+const informationDir = "information";
 
-console.log(
-  figlet.textSync("MUZINSTOCK", {
-    font: "Standard",
-    horizontalLayout: "default",
-    verticalLayout: "default",
-    width: 80,
-    whitespaceBreak: true,
-  })
-);
+(async () => {
+  displayBanner();
+  await makeKeyIndex();
+  work();
+})();
 
-fs.readdir(inputDir, (err, filelist) => {
-  if (err) {
-    console.log("error", err);
-  }
-  filelist.forEach((file) => {
-    const name = file.replace(".csv", "");
-    const input = path.resolve(inputDir, `${name}.csv`);
-    const output = path.resolve(outputDir, `${name}.xlsx`);
-    run(input, output);
-  });
-});
-
-const run = (inputFile, outputFile) => {
+function writeExcel(inputFile, outputFile) {
   const content = fs.readFileSync(inputFile, "binary");
   const charset = jschardet.detect(content);
   if (charset.encoding === "EUC-KR") {
@@ -55,6 +44,7 @@ const run = (inputFile, outputFile) => {
           return;
         }
 
+        let etc = stockCustomData[`${data[1]}`];
         let number = data[6];
         number = number.replaceAll(",", "");
         console.log(getCompanyDart(data[0]));
@@ -64,6 +54,7 @@ const run = (inputFile, outputFile) => {
           )}K)`,
           거래량: `${data[6]}`,
           사업보고서: `${getCompanyDart(data[0])}`,
+          기타: etc ? etc : "",
         };
         dataArr.push(result);
       } else {
@@ -73,6 +64,7 @@ const run = (inputFile, outputFile) => {
           return;
         }
 
+        let etc = stockCustomData[`${data[2]}`];
         let number = data[7];
         number = number.replaceAll(",", "");
         console.log(getCompanyDart(data[1]));
@@ -82,6 +74,7 @@ const run = (inputFile, outputFile) => {
           )}K)`,
           거래량: `${data[7]}`,
           사업보고서: `${getCompanyDart(data[1])}`,
+          기타: etc ? etc : "",
         };
         dataArr.push(result);
       }
@@ -94,9 +87,9 @@ const run = (inputFile, outputFile) => {
       exportExcel(dataArr, outputFile);
       console.log("Completed to create an excel.\n\n");
     });
-};
+}
 
-const exportExcel = (dataset, outputFile) => {
+function exportExcel(dataset, outputFile) {
   console.log(dataset);
   const book = new excel.Workbook({});
   const sheet = book.addWorksheet("stock", {
@@ -127,46 +120,50 @@ const exportExcel = (dataset, outputFile) => {
   sheet.column(1).setWidth(40);
   sheet.column(3).setWidth(56);
   sheet.cell(1, 1).string("header").style(headerStyle);
-  sheet.cell(1, 2).string("거래량").style(headerStyle);
+  sheet.cell(1, 2).string("기타").style(headerStyle);
   sheet.cell(1, 3).string("사업보고서").style(headerStyle);
+  sheet.cell(1, 4).string("거래량").style(headerStyle);
   let i = 0;
   for (i = 0; i < dataset.length; i++) {
     let header = dataset[i].header;
     let number = dataset[i]["거래량"];
     let doc = dataset[i]["사업보고서"];
+    let etc = dataset[i]["기타"];
 
     if (checkCell(number)) {
       sheet
         .cell(i + 2, 1)
         .string(header)
         .style(underlineStyle);
+      sheet.cell(i + 2, 2).string(etc);
+      sheet.cell(i + 2, 5).string(doc);
+      sheet.cell(i + 2, 3).formula(`HYPERLINK(E${i + 2},E${i + 2})`);
       sheet
-        .cell(i + 2, 2)
+        .cell(i + 2, 4)
         .string(number)
         .style(highlightStyle);
-      sheet.cell(i + 2, 4).string(doc);
-      sheet.cell(i + 2, 3).formula(`HYPERLINK(D${i + 2},D${i + 2})`);
     } else {
       sheet.cell(i + 2, 1).string(header);
-      sheet.cell(i + 2, 2).string(number);
-      sheet.cell(i + 2, 4).string(doc);
-      sheet.cell(i + 2, 3).formula(`HYPERLINK(D${i + 2},D${i + 2})`);
+      sheet.cell(i + 2, 2).string(etc);
+      sheet.cell(i + 2, 5).string(doc);
+      sheet.cell(i + 2, 3).formula(`HYPERLINK(E${i + 2},E${i + 2})`);
+      sheet.cell(i + 2, 4).string(number);
     }
   }
-  sheet.column(4).hide();
+  sheet.column(5).hide();
   book.write(outputFile);
-};
+}
 
-const checkCell = (value) => {
+function checkCell(value) {
   let modified = value.replaceAll(",", "");
   let intValue = parseInt(modified);
   if (intValue >= 10000000) {
     return true;
   }
   return false;
-};
+}
 
-const getCompanyDart = (corpCode) => {
+function getCompanyDart(corpCode) {
   let code = `${corpCode.replace("'", "").trim()}`;
 
   let searchUrl = `${hostUrl}/list.json?crtfc_key=${ACCESS_TOKEN}&corp_code=${code}&bgn_de=20220101&last_reprt_at=Y&pblntf_ty=A&pblntf_detail_ty=A001`;
@@ -192,4 +189,49 @@ const getCompanyDart = (corpCode) => {
       }
     }
   }
-};
+}
+
+function makeKeyIndex() {
+  const dataFile = resolve(informationDir, "data.xlsx");
+  if (!fs.existsSync(dataFile)) {
+    return;
+  }
+  return new Promise((resolved, rejected) => {
+    !fs.existsSync(informationDir) && fs.mkdirSync(informationDir);
+    readExcel(dataFile).then((rows) => {
+      for (let key of rows) {
+        stockCustomData[key[0]] = key[1];
+      }
+      resolved();
+    });
+  }).catch((e) => {
+    rejected(e);
+  });
+}
+
+function displayBanner() {
+  console.log(
+    figlet.textSync("MUZINSTOCK", {
+      font: "Standard",
+      horizontalLayout: "default",
+      verticalLayout: "default",
+      width: 80,
+      whitespaceBreak: true,
+    })
+  );
+}
+
+function work() {
+  fs.readdir(inputDir, (err, filelist) => {
+    if (err) {
+      console.log("error", err);
+    }
+    console.log("stockCustomData: ", stockCustomData);
+    filelist.forEach((file) => {
+      const name = file.replace(".csv", "");
+      const input = resolve(inputDir, `${name}.csv`);
+      const output = resolve(outputDir, `${name}.xlsx`);
+      writeExcel(input, output);
+    });
+  });
+}
