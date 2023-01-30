@@ -23,7 +23,7 @@ jobs:
         run: |
           mkdir input
           mkdir information
-          zip -r muzinstock.zip muzinstock.exe input
+          zip -r muzinstock.zip muzinstock.exe input information
 
       - name: Create release
         id: create_release
