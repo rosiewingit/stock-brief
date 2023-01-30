@@ -45,16 +45,16 @@ function writeExcel(inputFile, outputFile) {
         }
 
         let etc = stockCustomData[`${data[1]}`];
+        let information = etc ? ` / ${etc}` : "";
         let number = data[6];
         number = number.replaceAll(",", "");
         console.log(getCompanyDart(data[0]));
         const result = {
           header: `${data[3]} ${data[1]} (${data[5]}) (${Math.round(
             parseInt(number) / 1000
-          )}K)`,
+          )}K) ${information}`,
           거래량: `${data[6]}`,
           사업보고서: `${getCompanyDart(data[0])}`,
-          기타: etc ? etc : "",
         };
         dataArr.push(result);
       } else {
@@ -65,16 +65,16 @@ function writeExcel(inputFile, outputFile) {
         }
 
         let etc = stockCustomData[`${data[2]}`];
+        let information = etc ? ` / ${etc}` : "";
         let number = data[7];
         number = number.replaceAll(",", "");
         console.log(getCompanyDart(data[1]));
         const result = {
           header: `${data[4]} ${data[2]} (${data[6]}%) (${Math.round(
             parseInt(number) / 1000
-          )}K)`,
+          )}K) ${information}`,
           거래량: `${data[7]}`,
           사업보고서: `${getCompanyDart(data[1])}`,
-          기타: etc ? etc : "",
         };
         dataArr.push(result);
       }
@@ -120,34 +120,30 @@ function exportExcel(dataset, outputFile) {
   sheet.column(1).setWidth(40);
   sheet.column(3).setWidth(56);
   sheet.cell(1, 1).string("header").style(headerStyle);
-  sheet.cell(1, 2).string("기타").style(headerStyle);
+  sheet.cell(1, 2).string("거래량").style(headerStyle);
   sheet.cell(1, 3).string("사업보고서").style(headerStyle);
-  sheet.cell(1, 4).string("거래량").style(headerStyle);
   let i = 0;
   for (i = 0; i < dataset.length; i++) {
     let header = dataset[i].header;
     let number = dataset[i]["거래량"];
     let doc = dataset[i]["사업보고서"];
-    let etc = dataset[i]["기타"];
 
     if (checkCell(number)) {
       sheet
         .cell(i + 2, 1)
         .string(header)
         .style(underlineStyle);
-      sheet.cell(i + 2, 2).string(etc);
-      sheet.cell(i + 2, 5).string(doc);
-      sheet.cell(i + 2, 3).formula(`HYPERLINK(E${i + 2},E${i + 2})`);
       sheet
-        .cell(i + 2, 4)
+        .cell(i + 2, 2)
         .string(number)
         .style(highlightStyle);
-    } else {
-      sheet.cell(i + 2, 1).string(header);
-      sheet.cell(i + 2, 2).string(etc);
       sheet.cell(i + 2, 5).string(doc);
       sheet.cell(i + 2, 3).formula(`HYPERLINK(E${i + 2},E${i + 2})`);
-      sheet.cell(i + 2, 4).string(number);
+    } else {
+      sheet.cell(i + 2, 1).string(header);
+      sheet.cell(i + 2, 2).string(number);
+      sheet.cell(i + 2, 5).string(doc);
+      sheet.cell(i + 2, 3).formula(`HYPERLINK(E${i + 2},E${i + 2})`);
     }
   }
   sheet.column(5).hide();
